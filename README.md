@@ -2,6 +2,8 @@
 
 A transparent web overlay system for Linux, designed to display web content (like DPS meters) on top of other applications.
 
+This tool is opinionated specifically to solve a problem with the FFXIV tooling ecosystem on linux, there isn't really a great way to handle ACT / IINACT transparent overlays. You can probably reuse this to create some cool HUDs if you wanted to. 
+
 ## Features
 
 - Transparent window overlays
@@ -120,6 +122,57 @@ npm run overlay add stats-overlay http://localhost:3000 \
 # Start an overlay in debug mode
 npm run overlay start dps-meter --debug
 ```
+
+## Hyprland Configuration
+
+If you're using Hyprland as your window manager, you'll need to configure some window rules to ensure the overlays work correctly. By default, Hyprland may apply effects or window behaviors that interfere with the overlay's functionality.
+
+Add these rules to your Hyprland configuration file (typically `~/.config/hypr/hyprland.conf`):
+
+```bash
+# Window rules for overlays
+# Replace "FFXIV-Overlay" with the title you set for your overlay windows
+windowrulev2 = float, title:^(FFXIV-Overlay)$
+windowrulev2 = pin, title:^(FFXIV-Overlay)$
+windowrulev2 = noblur, title:^(FFXIV-Overlay)$
+windowrulev2 = nodim, title:^(FFXIV-Overlay)$
+windowrulev2 = noborder, title:^(FFXIV-Overlay)$
+windowrulev2 = noanim, title:^(FFXIV-Overlay)$
+```
+
+### Rule Explanations:
+- `float`: Ensures the overlay window isn't tiled
+- `pin`: Keeps the overlay visible on all workspaces
+- `noblur`: Prevents blur effects from being applied
+- `nodim`: Prevents dimming when the window is inactive
+- `noborder`: Removes window borders
+- `noanim`: Disables animations for the overlay window
+
+### Full Example with FFXIV Setup
+Here's a complete example showing how to configure both FFXIV and its overlays in Hyprland:
+
+```bash
+# FFXIV Workspace Configuration
+workspace = name:FFXIV, monitor:DP-2
+windowrulev2 = workspace name:FFXIV, title:^(XIVLauncher)$
+
+# FFXIV Main Window Rules
+windowrulev2 = maximize, title:^(FINAL FANTASY XIV)$
+windowrulev2 = opaque, title:^(FINAL FANTASY XIV)$
+windowrulev2 = nodim, title:^(FINAL FANTASY XIV)$
+windowrulev2 = workspace name:FFXIV, title:^(FINAL FANTASY XIV)$
+
+# FFXIV Overlay Rules
+windowrulev2 = workspace name:FFXIV, title:^(FFXIV-Overlay)$
+windowrulev2 = float, title:^(FFXIV-Overlay)$
+windowrulev2 = pin, title:^(FFXIV-Overlay)$
+windowrulev2 = noblur, title:^(FFXIV-Overlay)$
+windowrulev2 = nodim, title:^(FFXIV-Overlay)$
+windowrulev2 = noborder, title:^(FFXIV-Overlay)$
+windowrulev2 = noanim, title:^(FFXIV-Overlay)$
+```
+
+Note: Make sure to adjust the window titles in the rules to match the titles you set for your overlays in the configuration.
 
 ## Development
 
