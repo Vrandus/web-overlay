@@ -1,31 +1,37 @@
 {
   "name": "web-overlay",
   "version": "0.1.0",
-  "description": "A configurable overlay window manager",
+  "description": "A configurable overlay window manager for Linux",
   "main": "dist/main.js",
   "bin": {
     "web-overlay": "./dist/cli.js"
   },
   "scripts": {
-    "start": "tsc && electron .",
-    "dev": "tsc && electron .",
+    "start": "electron .",
+    "dev": "tsc -w",
     "build": "tsc",
     "watch": "tsc -w",
     "prepare": "npm run build",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build",
+    "test": "mocha -r ts-node/register 'tst/**/*.test.ts'"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/chai": "^4.3.11",
     "@types/chalk": "^2.2.4",
     "@types/commander": "^2.12.5",
-    "@types/node": "^20.11.24",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.0",
+    "chai": "^4.3.10",
     "electron": "^29.1.0",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "dependencies": {
     "chalk": "^4.1.2",
-    "commander": "^12.0.0",
+    "commander": "^11.1.0",
     "electron-store": "^8.1.0"
   },
   "files": [

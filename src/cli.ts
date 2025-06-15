@@ -18,34 +18,42 @@ interface AddOptions {
   opacity: string;
   clickThrough: boolean;
   alwaysOnTop?: boolean;
+  config?: string;
 }
 
 interface StartOptions {
   debug?: boolean;
+  config?: string;
+}
+
+interface BaseOptions {
+  config?: string;
 }
 
 const program = new Command();
-const configPath = path.join(os.homedir(), '.config', 'web-overlay', 'config.json');
-const store = new Store<GlobalConfig>({
-  defaults: DEFAULT_CONFIG,
-  cwd: path.dirname(configPath),
-  name: path.basename(configPath, '.json')
-});
 
-// Ensure overlays array exists
-if (!store.get('overlays')) {
-  store.set('overlays', []);
-}
+// Helper to get store instance based on config path
+const getStore = (configPath?: string) => {
+  const storePath = configPath || path.join(os.homedir(), '.config', 'web-overlay', 'config.json');
+  return new Store<GlobalConfig>({
+    defaults: DEFAULT_CONFIG,
+    cwd: path.dirname(storePath),
+    name: path.basename(storePath, '.json')
+  });
+};
 
 program
   .name('web-overlay')
   .description('A configurable overlay window manager for Linux')
-  .version('0.1.0');
+  .version('0.1.0')
+  .option('--config <path>', 'Path to config file');
 
 program
   .command('list')
   .description('List all configured overlays')
-  .action(() => {
+  .option('--config <path>', 'Path to config file')
+  .action((options: BaseOptions) => {
+    const store = getStore(options.config);
     const config = store.get('overlays');
     if (config.length === 0) {
       console.log(chalk.yellow('No overlays configured.'));
@@ -74,7 +82,7 @@ program
   .argument('<id>', 'Unique identifier for the overlay')
   .argument('<url>', 'URL for the overlay content')
   .option('--ws-uri <uri>', 'WebSocket URI for the overlay')
-  .option('--name <name>', 'Display name for the overlay')
+  .option('--name <n>', 'Display name for the overlay')
   .option('--x <number>', 'X position', '100')
   .option('--y <number>', 'Y position', '100')
   .option('--width <number>', 'Window width', '400')
@@ -82,7 +90,9 @@ program
   .option('--opacity <number>', 'Window opacity (0-1)', '0.9')
   .option('--no-click-through', 'Disable click-through')
   .option('--always-on-top', 'Keep window always on top')
+  .option('--config <path>', 'Path to config file')
   .action((id: string, url: string, options: AddOptions) => {
+    const store = getStore(options.config);
     const config = store.get('overlays');
     if (config.some((o: OverlayConfig) => o.id === id)) {
       console.error(chalk.red(`Error: Overlay with ID "${id}" already exists`));
@@ -115,7 +125,9 @@ program
   .command('remove')
   .description('Remove an overlay')
   .argument('<id>', 'ID of the overlay to remove')
-  .action((id: string) => {
+  .option('--config <path>', 'Path to config file')
+  .action((id: string, options: BaseOptions) => {
+    const store = getStore(options.config);
     const config = store.get('overlays');
     const newConfig = config.filter((o: OverlayConfig) => o.id !== id);
     
@@ -133,11 +145,13 @@ program
   .description('Start an overlay')
   .argument('[id]', 'ID of the overlay to start (omit for all)')
   .option('--debug', 'Enable debug mode')
+  .option('--config <path>', 'Path to config file')
   .action((id: string | undefined, options: StartOptions) => {
+    const store = getStore(options.config);
     if (id) {
-      startOverlay(id, options.debug);
+      startOverlay(id, options.debug, store);
     } else {
-      startAllOverlays(options.debug);
+      startAllOverlays(options.debug, store);
     }
   });
 
@@ -145,15 +159,17 @@ program
   .command('stop')
   .description('Stop an overlay')
   .argument('[id]', 'ID of the overlay to stop (omit for all)')
-  .action((id: string | undefined) => {
+  .option('--config <path>', 'Path to config file')
+  .action((id: string | undefined, options: BaseOptions) => {
+    const store = getStore(options.config);
     if (id) {
-      stopOverlay(id);
+      stopOverlay(id, store);
     } else {
-      stopAllOverlays();
+      stopAllOverlays(store);
     }
   });
 
-function startOverlay(overlayId: string, debug = false) {
+function startOverlay(overlayId: string, debug = false, store: Store<GlobalConfig>) {
   const config = store.get('overlays');
   const overlay = config.find((o: OverlayConfig) => o.id === overlayId);
   
@@ -179,7 +195,7 @@ function startOverlay(overlayId: string, debug = false) {
   console.log(chalk.green(`Started overlay "${overlayId}"`));
 }
 
-function stopOverlay(overlayId: string) {
+function stopOverlay(overlayId: string, store: Store<GlobalConfig>) {
   const config = store.get('overlays');
   const overlay = config.find((o: OverlayConfig) => o.id === overlayId);
   
@@ -197,7 +213,7 @@ function stopOverlay(overlayId: string) {
   }
 }
 
-function startAllOverlays(debug = false) {
+function startAllOverlays(debug = false, store: Store<GlobalConfig>) {
   const config = store.get('overlays');
   if (config.length === 0) {
     console.log(chalk.yellow('No overlays configured.'));
@@ -205,12 +221,12 @@ function startAllOverlays(debug = false) {
   }
   
   for (const overlay of config) {
-    startOverlay(overlay.id, debug);
+    startOverlay(overlay.id, debug, store);
   }
   console.log(chalk.green('Started all overlays'));
 }
 
-function stopAllOverlays() {
+function stopAllOverlays(store: Store<GlobalConfig>) {
   const config = store.get('overlays');
   if (config.length === 0) {
     console.log(chalk.yellow('No overlays configured.'));
