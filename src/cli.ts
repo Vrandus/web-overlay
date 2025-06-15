@@ -45,7 +45,7 @@ const getStore = (configPath?: string) => {
 program
   .name('web-overlay')
   .description('A configurable overlay window manager for Linux')
-  .version('0.1.0')
+  .version('0.1.11')
   .option('--config <path>', 'Path to config file');
 
 program
@@ -204,11 +204,13 @@ function stopOverlay(overlayId: string, store: Store<GlobalConfig>) {
     process.exit(1);
   }
 
-  const { execSync } = require('child_process');
-  try {
-    execSync(`pkill -f "electron.*--overlay-id.*main\.js ${overlayId}"`);
+  const { spawnSync } = require('child_process');
+  const result = spawnSync('pkill', ['-f', `electron.*--overlay-id.*main\.js ${overlayId}`]);
+  
+  // pkill exit codes: 0 = processes killed, 1 = no processes found
+  if (result.status === 0) {
     console.log(chalk.green(`Stopped overlay "${overlayId}"`));
-  } catch (error) {
+  } else {
     console.log(chalk.yellow(`No running process found for overlay "${overlayId}"`));
   }
 }
@@ -233,12 +235,28 @@ function stopAllOverlays(store: Store<GlobalConfig>) {
     return;
   }
 
-  const { execSync } = require('child_process');
-  try {
-    execSync(`pkill -f "electron.*--overlay-id"`);
+  const { spawnSync } = require('child_process');
+  console.log(chalk.dim('Attempting to stop all overlays...'));
+  
+  // First try to list matching processes
+  const psList = spawnSync('pgrep', ['-f', 'electron.*--overlay-id']);
+  if (psList.stdout) {
+    console.log(chalk.dim(`Found processes: ${psList.stdout.toString()}`));
+  }
+  
+  const result = spawnSync('pkill', ['-f', 'electron.*--overlay-id']);
+  console.log(chalk.dim(`pkill exit code: ${result.status}`));
+  if (result.stderr) {
+    console.log(chalk.dim(`pkill stderr: ${result.stderr.toString()}`));
+  }
+  
+  // pkill exit codes: 0 = processes killed, 1 = no processes found
+  if (result.status === 0) {
     console.log(chalk.green('Stopped all overlays'));
-  } catch (error) {
+  } else if (result.status === 1) {
     console.log(chalk.yellow('No running overlays found'));
+  } else {
+    console.log(chalk.red(`Error stopping overlays (exit code ${result.status})`));
   }
 }
 

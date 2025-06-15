@@ -1,10 +1,10 @@
 {
   "name": "web-overlay",
-  "version": "0.1.0",
+  "version": "0.1.11",
   "description": "A configurable overlay window manager for Linux",
   "main": "dist/main.js",
   "bin": {
-    "web-overlay": "./dist/cli.js"
+    "web-overlay": "./dist/src/cli.js"
   },
   "scripts": {
     "start": "electron .",
