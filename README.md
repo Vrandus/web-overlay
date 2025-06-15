@@ -24,7 +24,7 @@ This tool is opinionated specifically to solve a problem with the FFXIV tooling 
 
 1. Clone and install in one step:
 ```bash
-git clone https://github.com/yourusername/web-overlay.git && cd web-overlay && sudo ./install.sh
+git clone https://github.com/Vrandus/web-overlay.git && cd web-overlay && sudo ./install.sh
 ```
 
 This will:
