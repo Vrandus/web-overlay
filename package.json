@@ -1,0 +1,32 @@
+{
+  "name": "web-overlay",
+  "version": "0.1.0",
+  "description": "A configurable overlay window manager",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "tsc && electron .",
+    "dev": "tsc && electron .",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cli": "tsc && node dist/cli.js",
+    "overlay": "npm run cli --",
+    "overlay:list": "npm run cli -- list",
+    "overlay:add": "npm run cli -- add",
+    "overlay:remove": "npm run cli -- remove",
+    "overlay:start": "npm run cli -- start",
+    "overlay:stop": "npm run cli -- stop",
+    "overlay:start-all": "npm run cli -- start-all",
+    "overlay:stop-all": "npm run cli -- stop-all",
+    "overlay:help": "npm run cli -- help"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "electron": "^29.1.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0"
+  }
+} 
