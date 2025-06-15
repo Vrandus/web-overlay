@@ -66,3 +66,5 @@ coverage/
 
 # Yarn Integrity file
 .yarn-integrity 
+
+.cursor/

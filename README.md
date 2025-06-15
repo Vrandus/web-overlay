@@ -12,6 +12,7 @@ This tool is opinionated specifically to solve a problem with the FFXIV tooling 
 - Persistent window positions
 - WebSocket support for real-time updates
 - Configuration file based setup
+- Global CLI tool for easy management
 
 ## Prerequisites
 
@@ -20,30 +21,104 @@ This tool is opinionated specifically to solve a problem with the FFXIV tooling 
 
 ## Installation
 
+### Option 1: Quick Install (Recommended)
+
+1. Clone and install in one step:
+```bash
+git clone https://github.com/yourusername/web-overlay.git && cd web-overlay && ./install.sh
+```
+
+This will:
+- Install all dependencies
+- Build the project
+- Install the CLI tool globally
+- Make it available as `web-overlay` command
+
+### Option 2: Manual Installation
+
 1. Clone the repository:
 ```bash
 git clone https://github.com/yourusername/web-overlay.git
 cd web-overlay
 ```
 
-2. Install dependencies:
+2. Install dependencies and build:
 ```bash
 npm install
-```
-
-3. Build the project:
-```bash
 npm run build
 ```
 
-## Usage
-
-1. Start the application:
+3. Install globally:
 ```bash
-npm start
+npm install -g .
 ```
 
-2. Configure your overlays in the configuration file (see Configuration section below)
+## CLI Usage
+
+The `web-overlay` command is now available globally. Here are the available commands:
+
+### Managing Overlays
+
+```bash
+# List all configured overlays
+web-overlay list
+
+# Add a new overlay
+web-overlay add <id> <url> [options]
+
+# Remove an overlay
+web-overlay remove <id>
+
+# Start a specific overlay
+web-overlay start <id> [--debug]
+
+# Stop a specific overlay
+web-overlay stop <id>
+
+# Start all overlays
+web-overlay start
+
+# Stop all overlays
+web-overlay stop
+```
+
+### Command Options
+
+When adding a new overlay (`web-overlay add`), the following options are available:
+
+```bash
+Options:
+  --ws-uri <uri>         WebSocket URI for the overlay
+  --name <name>          Display name for the overlay
+  --x <number>           X position (default: 100)
+  --y <number>           Y position (default: 100)
+  --width <number>       Window width (default: 400)
+  --height <number>      Window height (default: 300)
+  --opacity <number>     Window opacity (0-1, default: 0.9)
+  --no-click-through     Disable click-through
+  --always-on-top        Keep window always on top
+```
+
+### Examples
+
+```bash
+# Add a DPS meter overlay
+web-overlay add dps-meter file:///path/to/overlay.html \
+  --name "DPS Meter" \
+  --ws-uri ws://127.0.0.1:10501/ws \
+  --width 800 \
+  --height 600 \
+  --opacity 0.8
+
+# Start with debug logging
+web-overlay start dps-meter --debug
+
+# List all configured overlays
+web-overlay list
+
+# Stop all running overlays
+web-overlay stop
+```
 
 ## Configuration
 
@@ -73,65 +148,12 @@ Example configuration:
 }
 ```
 
-## CLI Commands
-
-The overlay manager comes with a command-line interface for managing overlays. Here are some common commands:
-
-### List Overlays
-```bash
-# Show all configured overlays
-npm run overlay list
-```
-
-### Managing Individual Overlays
-```bash
-# Add a new overlay
-npm run overlay add dps-meter file:///path/to/overlay.html --name "DPS Meter" --ws-uri ws://127.0.0.1:10501/ws
-
-# Start a specific overlay
-npm run overlay start dps-meter
-
-# Stop a specific overlay
-npm run overlay stop dps-meter
-
-# Remove an overlay from configuration
-npm run overlay remove dps-meter
-```
-
-### Managing All Overlays
-```bash
-# Start all configured overlays
-npm run overlay start-all
-
-# Stop all running overlays
-npm run overlay stop-all
-```
-
-### Additional Options
-When adding or starting overlays, you can use these options:
-```bash
-# Add an overlay with custom position and size
-npm run overlay add stats-overlay http://localhost:3000 \
-  --name "Stats" \
-  --x 200 \
-  --y 300 \
-  --width 800 \
-  --height 600 \
-  --opacity 0.8
-
-# Start an overlay in debug mode
-npm run overlay start dps-meter --debug
-```
-
 ## Hyprland Configuration
 
-If you're using Hyprland as your window manager, you'll need to configure some window rules to ensure the overlays work correctly. By default, Hyprland may apply effects or window behaviors that interfere with the overlay's functionality.
-
-Add these rules to your Hyprland configuration file (typically `~/.config/hypr/hyprland.conf`):
+If you're using Hyprland as your window manager, you'll need to configure some window rules to ensure the overlays work correctly. Add these rules to your Hyprland configuration file (typically `~/.config/hypr/hyprland.conf`):
 
 ```bash
 # Window rules for overlays
-# Replace "FFXIV-Overlay" with the title you set for your overlay windows
 windowrulev2 = float, title:^(FFXIV-Overlay)$
 windowrulev2 = pin, title:^(FFXIV-Overlay)$
 windowrulev2 = noblur, title:^(FFXIV-Overlay)$
@@ -139,14 +161,6 @@ windowrulev2 = nodim, title:^(FFXIV-Overlay)$
 windowrulev2 = noborder, title:^(FFXIV-Overlay)$
 windowrulev2 = noanim, title:^(FFXIV-Overlay)$
 ```
-
-### Rule Explanations:
-- `float`: Ensures the overlay window isn't tiled
-- `pin`: Keeps the overlay visible on all workspaces
-- `noblur`: Prevents blur effects from being applied
-- `nodim`: Prevents dimming when the window is inactive
-- `noborder`: Removes window borders
-- `noanim`: Disables animations for the overlay window
 
 ### Full Example with FFXIV Setup
 Here's a complete example showing how to configure both FFXIV and its overlays in Hyprland:
@@ -171,8 +185,6 @@ windowrulev2 = nodim, title:^(FFXIV-Overlay)$
 windowrulev2 = noborder, title:^(FFXIV-Overlay)$
 windowrulev2 = noanim, title:^(FFXIV-Overlay)$
 ```
-
-Note: Make sure to adjust the window titles in the rules to match the titles you set for your overlays in the configuration.
 
 ## Development
 
