@@ -78,6 +78,7 @@ class OverlayManager {
       frame: false,
       alwaysOnTop: config.alwaysOnTop,
       type: 'notification',
+      focusable: !config.clickThrough,
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true

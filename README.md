@@ -12,7 +12,6 @@ This tool is opinionated specifically to solve a problem with the FFXIV tooling 
 - Persistent window positions
 - WebSocket support for real-time updates
 - Configuration file based setup
-- Global CLI tool for easy management
 
 ## Prerequisites
 
@@ -25,7 +24,7 @@ This tool is opinionated specifically to solve a problem with the FFXIV tooling 
 
 1. Clone and install in one step:
 ```bash
-git clone https://github.com/yourusername/web-overlay.git && cd web-overlay && ./install.sh
+git clone https://github.com/yourusername/web-overlay.git && cd web-overlay && sudo ./install.sh
 ```
 
 This will:
@@ -157,6 +156,7 @@ If you're using Hyprland as your window manager, you'll need to configure some w
 windowrulev2 = float, title:^(FFXIV-Overlay)$
 windowrulev2 = pin, title:^(FFXIV-Overlay)$
 windowrulev2 = noblur, title:^(FFXIV-Overlay)$
+windowrulev2 = nofocus, title:^(FFXIV-Overlay)$
 windowrulev2 = nodim, title:^(FFXIV-Overlay)$
 windowrulev2 = noborder, title:^(FFXIV-Overlay)$
 windowrulev2 = noanim, title:^(FFXIV-Overlay)$
