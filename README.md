@@ -37,7 +37,7 @@ This will:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/web-overlay.git
+git clone https://github.com/Vrandus/web-overlay.git
 cd web-overlay
 ```
 
